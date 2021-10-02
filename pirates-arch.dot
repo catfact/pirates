@@ -1,0 +1,59 @@
+digraph G { 
+    
+    splines=false;
+    compound=true;
+//    clusterrank=global;
+    rankdir=TB;
+    ranksep=0.5;
+    newrank=true;
+
+    subgraph cluster_0 { 
+        label= "norns system";
+        tape [shape=component, label="audio.tape_*"] ;
+        node [shape=folder label="~/dust/audio/.../.wav"] wav;
+    }
+
+    
+    subgraph cluster_1 { 
+        label = "norns script";
+        node [shape=component];
+        script_ui [label="interface"];
+        script_bl [label="logic"];
+        script_ui -> script_bl -> script_ui;
+        
+        script_record[label="manage capture"];
+        script_transfer[label="manage UL/DL"];
+        script_play [label="manage playback"];
+        script_params[label="effect params"];
+
+        script_bl -> script_play;
+        script_bl -> script_record;
+        script_bl -> script_params;
+        script_bl -> script_transfer;
+    };
+
+    subgraph cluster_2 { 
+        label = "norns engine";
+        rank="same";
+        node [shape=component];
+        engine_playback -> engine_effects;
+    };
+
+    subgraph cluster_3 { 
+        label = "backend";
+        backend_todo [style=dotted, label="???"] ; 
+    };
+
+
+    tape -> wav;
+    wav -> engine_playback;
+    engine_effects -> tape;
+    script_record -> tape;
+    script_play -> engine_playback;
+    script_params -> engine_effects;
+
+    wav -> script_transfer -> backend_todo -> script_transfer -> wav;
+
+//    {rank=max; norns_script; norns_system; backend}
+  //  {rank=same; norns_system; norns_engine; }
+}
